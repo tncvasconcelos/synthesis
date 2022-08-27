@@ -20,3 +20,6 @@ Smith, S. A., & Brown, J. W. (2018). Constructing a broadly inclusive seed plant
 
 Distribution data was kindly made available by:
 https://powo.science.kew.org/ [Accessed February 2022]
+
+
+Note that the data for some of the plots is a few years old. 
