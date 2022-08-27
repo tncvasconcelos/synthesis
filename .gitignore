@@ -39,3 +39,4 @@ vignettes/*.pdf
 .Renviron
 
 gbif_big_files/
+Old/
