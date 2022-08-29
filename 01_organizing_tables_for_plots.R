@@ -3,8 +3,9 @@
 source("00_utility_functions_synthesis.R")
 
 # Reading trees from Smith and Brown (2018)
-whole_taxized_tree <- read.tree("ALLMB.taxized.noauthor.tre")
-gb_taxized_tree <- read.tree("GBMB.taxized.noauthor.tre")
+# These trees have been previously taxized for the GBIF taxonomic backbone
+whole_taxized_tree <- read.tree("data/ALLMB.taxized.noauthor.tre")
+gb_taxized_tree <- read.tree("data/GBMB.taxized.noauthor.tre")
 
 # tip name cleaning:
 # remove indet, unmatched, etc

@@ -3,30 +3,34 @@
 source("00_utility_functions_synthesis.R")
 
 # Making maps for Figure 2
-#########################
-# If local
-#setwd("~/Desktop/WCVP_special_issue/James_perennial_annual/life_history_houwie")
+
+#######################################################################################
+#######################################################################################
+##### IMPORTANT ##### 
+# The following data is under an embargo and will probably be publicly available only in 2023.
+# The use of the POWO data for this synthesis was kindly made available by Rafael Govaerts. 
+# Please contact R.Govaerts@kew.org to have access to this dataset before 2023.
+# Or access https://powo.science.kew.org for more information.
 source("/Users/thaisvasconcelos/Desktop/WCVP_special_issue/WCVPtools/WCVPtools_functions.R")
 dist_sample <- read.table("/Users/thaisvasconcelos/Desktop/WCVP_special_issue/wcvp_names_and_distribution_special_edition_2022/wcvp_distribution.txt", sep="|", header=TRUE, quote = "", fill=TRUE, encoding = "UTF-8")
 names_sample <- read.table("/Users/thaisvasconcelos/Desktop/WCVP_special_issue/wcvp_names_and_distribution_special_edition_2022/wcvp_names.txt", sep="|", header=TRUE, quote = "", fill=TRUE, encoding = "UTF-8")
+#######################################################################################
+#######################################################################################
 
-#########################
 all_vars <- merge(dist_sample, names_sample, by="plant_name_id")
 
 #########################
 # reference table for taxized names
 #-----------------------------
-# If local
-reference_table <- list.files("/Users/thaisvasconcelos/Desktop/WCVP_special_issue/WCVPtools/taxized_reference_tables", full.names = T)
+reference_table <- list.files("data/taxized_reference_tables", full.names = T)
 reference_table <- do.call(rbind, lapply(reference_table, read.csv))
 
 #-----------------------------
 
 ###########
-# Looking at the WCVP table and TDWG to clean GBIF points
+# Loading TDWG shape files (see README in data/wgsrpd-master/ for more information)
 #-----------------------------
-# If local
-path="/Users/thaisvasconcelos/Desktop/WCVP_special_issue/WCVPtools/wgsrpd-master/level3/level3.shp"
+path="data/wgsrpd-master/level3/level3.shp"
 #-----------------------------
 
 twgd_data <- suppressWarnings(maptools::readShapeSpatial(path))
@@ -62,9 +66,7 @@ figure2_map_C <- ggplot(data = twgd_data_C) +
   scale_fill_viridis_c(option = "plasma") +
   theme_classic()
 
-#
-
-pdf("figure2_raw.pdf",height=15,width=10)
-grid.arrange(figure2_map_A, figure2_map_B, figure2_map_C, ncol=1, nrow = 3)
-dev.off()
+#pdf("figure2_raw.pdf",height=15,width=10)
+#grid.arrange(figure2_map_A, figure2_map_B, figure2_map_C, ncol=1, nrow = 3)
+#dev.off()
 
