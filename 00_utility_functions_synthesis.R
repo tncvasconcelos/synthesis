@@ -10,6 +10,8 @@ library(ggplot2)
 library(maps)
 library(ggthemes)
 library(viridis)
+library(ggridges)
+library(gridExtra)
 
 # Function to taxize species list according to GBIF taxonomy
 gbif.taxize <- function (species) {
@@ -59,6 +61,9 @@ simplify.names.taxize <- function(names) {
     splitted_names <- strsplit(one_tmp_string," ")[[1]]
     genus <- splitted_names[1]
     epiphet <- splitted_names[2]
+    if(is.na(epiphet)) {
+      full_name <- "tip_to_drop" # indet species
+    } else {
     if(any(grepl("indet_sp",splitted_names))) {
       full_name <- "tip_to_drop" # indet species
     } else {
@@ -88,6 +93,7 @@ simplify.names.taxize <- function(names) {
           }
         }  
       }
+    }
     }
     results[name_index] <- full_name
   }
@@ -122,6 +128,8 @@ organize.bubble.plot2 <- function(points, twgd_data) {
   results$lat <- as.numeric(results$lat)
   return(results)
 }
+
+
 #########################
 organize.bubble.plot <- function(trait_table, reference_table, all_vars, twgd_data) {
   tmp_reference_table <- subset(reference_table, reference_table$wcvp_name %in% unique(trait_table$species))
@@ -153,6 +161,8 @@ organize.bubble.plot <- function(trait_table, reference_table, all_vars, twgd_da
   results$lat <- as.numeric(results$lat)
   return(results)
 }
+
+
 #########################
 sum.twgd.trait <- function(one_dataset,twgd_data,all_vars) {
   tmp_rasters <- list()
@@ -168,4 +178,31 @@ sum.twgd.trait <- function(one_dataset,twgd_data,all_vars) {
     cat(paste0(i, " out of ", nrow(one_dataset)), "\r")
   }
   return(tmp_rasters)
+}
+
+#######
+map.for.synthesis <- function(trait_table, reference_table, all_vars, twgd_data) {
+  trait_table=trait_table
+  colnames(trait_table) <- c("species","gbif")
+  organized_table_for_plot_total <- organize.bubble.plot(trait_table, reference_table, all_vars, twgd_data)
+  organized_table_for_plot_no_data <- organize.bubble.plot(subset(trait_table, trait_table$gbif=="no_data"), reference_table, all_vars, twgd_data)
+  
+  nas <- rep(NA, nrow(organized_table_for_plot_no_data))
+  proportion_table <- data.frame(sp_rich_prop=nas, sp_rich_total=nas, one_area=nas, lon=nas, lat=nas)
+  for(i in 1:nrow(organized_table_for_plot_no_data)) {
+    tmp_sp_rich <- organized_table_for_plot_no_data$sp_rich[i]
+    one_area <- organized_table_for_plot_no_data$one_area[i]
+    total_sp_rich <- organized_table_for_plot_total$sp_rich[organized_table_for_plot_total$one_area == one_area]
+    one_proportion <- round(tmp_sp_rich / total_sp_rich, 3)
+    proportion_table$sp_rich_prop[i] <- one_proportion
+    proportion_table$sp_rich_total[i] <- total_sp_rich
+    proportion_table$one_area[i] <- one_area
+    proportion_table$lon[i] <- organized_table_for_plot_no_data$lon[i]
+    proportion_table$lat[i] <- organized_table_for_plot_no_data$lat[i]
+  }
+  
+  # hist(proportion_table$sp_rich_prop)
+  # cutting the data
+
+  return(proportion_table)
 }

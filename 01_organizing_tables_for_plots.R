@@ -3,8 +3,6 @@
 source("00_utility_functions_synthesis.R")
 
 # Reading trees from Smith and Brown (2018)
-whole_taxized_tree <- readRDS("trees/taxized_ALLOTB.Rdata")
-whole_taxized_tree$tip.label <- unname(whole_taxized_tree$tip.label)
 whole_taxized_tree <- read.tree("ALLMB.taxized.noauthor.tre")
 gb_taxized_tree <- read.tree("GBMB.taxized.noauthor.tre")
 
@@ -55,8 +53,8 @@ ploidy_taxized <- fix.names.taxize(ploidy$Taxon)
 ploidy_taxized <- subset(ploidy_taxized, !grepl("UNMATCHED",ploidy_taxized))
 ploidy_taxized <- simplify.names.taxize(ploidy_taxized)
 
-ploidy_gap_table <- data.frame(species=cleaned_tree$tip.label, seed_mass=NA)
-ploidy_gap_table$seed_mass[which(ploidy_gap_table$species %in% ploidy_taxized)] <- "has_data"
-ploidy_gap_table$seed_mass[which(!ploidy_gap_table$species %in% ploidy_taxized)] <- "no_data"
+ploidy_gap_table <- data.frame(species=cleaned_tree$tip.label, ploidy=NA)
+ploidy_gap_table$ploidy[which(ploidy_gap_table$species %in% ploidy_taxized)] <- "has_data"
+ploidy_gap_table$ploidy[which(!ploidy_gap_table$species %in% ploidy_taxized)] <- "no_data"
 
 write.csv(ploidy_gap_table, file="ploidy_gap_table.csv", row.names=F)

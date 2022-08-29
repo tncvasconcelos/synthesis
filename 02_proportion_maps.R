@@ -2,8 +2,6 @@
 
 source("00_utility_functions_synthesis.R")
 
-setwd("/Users/thaisvasconcelos/Desktop/manuscripts/evol_potential/synthesis/synthesis")
-
 # Making maps for Figure 2
 #########################
 # If local
@@ -32,41 +30,41 @@ path="/Users/thaisvasconcelos/Desktop/WCVP_special_issue/WCVPtools/wgsrpd-master
 #-----------------------------
 
 twgd_data <- suppressWarnings(maptools::readShapeSpatial(path))
-
-gbif_data <- read.csv("woodness_gap_table.csv")
-colnames(gbif_data) <- c("species","gbif")
-
-organized_table_for_plot_total <- organize.bubble.plot(gbif_data, reference_table, all_vars, twgd_data)
-organized_table_for_plot_no_data <- organize.bubble.plot(subset(gbif_data, gbif_data$gbif=="no_data"), reference_table, all_vars, twgd_data)
-
-nas <- rep(NA, nrow(organized_table_for_plot_no_data))
-proportion_table <- data.frame(sp_rich_prop=nas, sp_rich_total=nas, one_area=nas, lon=nas, lat=nas)
-for(i in 1:nrow(organized_table_for_plot_no_data)) {
-  tmp_sp_rich <- organized_table_for_plot_no_data$sp_rich[i]
-  one_area <- organized_table_for_plot_no_data$one_area[i]
-  total_sp_rich <- organized_table_for_plot_total$sp_rich[organized_table_for_plot_total$one_area == one_area]
-  one_proportion <- round(tmp_sp_rich / total_sp_rich, 3)
-  proportion_table$sp_rich_prop[i] <- one_proportion
-  proportion_table$sp_rich_total[i] <- total_sp_rich
-  proportion_table$one_area[i] <- one_area
-  proportion_table$lon[i] <- organized_table_for_plot_no_data$lon[i]
-  proportion_table$lat[i] <- organized_table_for_plot_no_data$lat[i]
-}
-
-hist(proportion_table$sp_rich_prop)
-# cutting the data
-
-#proportion_table$sp_rich_prop[which(proportion_table$sp_rich_prop > 0.5)] <- 0.4
-#proportion_table$sp_rich_prop[which(between(proportion_table$sp_rich_prop, 0.2, 0.3))] <- 2
-#proportion_table$sp_rich_prop[which(between(proportion_table$sp_rich_prop, 0.1, 0.2))] <- 1
-#proportion_table$sp_rich_prop[which(between(proportion_table$sp_rich_prop, 0, 0.1))] <- 0
-
 twgd_data01 <- sf::st_as_sf(twgd_data)
-twgd_data01 <- merge(twgd_data01, proportion_table, by.x="LEVEL3_COD", by.y="one_area")
 
-twgd_data01 <- subset(twgd_data01 , twgd_data01$LEVEL3_NAM!="Antarctica")
-
-tmp_map1 <- ggplot(data = twgd_data01) +
+# Figure 2A: molecular data for phylogenetic reconstruction
+trait_table_A <- read.csv("gb_gap_table.csv")
+proportion_table_A <- map.for.synthesis(trait_table=trait_table_A, reference_table, all_vars, twgd_data)
+twgd_data_A <- merge(twgd_data01, proportion_table_A, by.x="LEVEL3_COD", by.y="one_area")
+twgd_data_A <- subset(twgd_data_A , twgd_data_A$LEVEL3_NAM!="Antarctica")
+figure2_map_A <- ggplot(data = twgd_data_A) +
   geom_sf(aes(fill = sp_rich_prop)) +
-  scale_fill_viridis_c(option = "plasma", trans="sqrt") +
+  scale_fill_viridis_c(option = "plasma") +
   theme_classic()
+
+# Figure 2B: ploidy data
+trait_table_B <- read.csv("ploidy_gap_table.csv")
+proportion_table_B <- map.for.synthesis(trait_table=trait_table_B, reference_table, all_vars, twgd_data)
+twgd_data_B <- merge(twgd_data01, proportion_table_B, by.x="LEVEL3_COD", by.y="one_area")
+twgd_data_B <- subset(twgd_data_B , twgd_data_B$LEVEL3_NAM!="Antarctica")
+figure2_map_B <- ggplot(data = twgd_data_B) +
+  geom_sf(aes(fill = sp_rich_prop)) +
+  scale_fill_viridis_c(option = "plasma") +
+  theme_classic()
+
+# Figure 2C: seed mass
+trait_table_C <- read.csv("seedmass_gap_table.csv")
+proportion_table_C <- map.for.synthesis(trait_table=trait_table_C, reference_table, all_vars, twgd_data)
+twgd_data_C <- merge(twgd_data01, proportion_table_C, by.x="LEVEL3_COD", by.y="one_area")
+twgd_data_C <- subset(twgd_data_C , twgd_data_C$LEVEL3_NAM!="Antarctica")
+figure2_map_C <- ggplot(data = twgd_data_C) +
+  geom_sf(aes(fill = sp_rich_prop)) +
+  scale_fill_viridis_c(option = "plasma") +
+  theme_classic()
+
+#
+
+pdf("figure2_raw.pdf",height=15,width=10)
+grid.arrange(figure2_map_A, figure2_map_B, figure2_map_C, ncol=1, nrow = 3)
+dev.off()
+
