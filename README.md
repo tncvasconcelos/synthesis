@@ -1,4 +1,4 @@
-Codes used to generate Figure 2 of paper "Discovering the rules of plant biogeography using a trait-based approach" (submitted)
+Codes used to generate Figure 2 of paper "A trait-based approach to determining principles of plant biogeography " (in press. *American Journal of Botany*)
 
 Author: Thais Vasconcelos
 
